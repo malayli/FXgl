@@ -5,22 +5,24 @@
 #define SFX_ScreenHeight 159
 
 // Define the SuperFX registers
-#define GSU_R15u (*(volatile uint8_t *)0x301e)
-#define GSU_R15l (*(volatile uint8_t *)0x301f)
-#define GSU_CBR (*(volatile uint8_t *)0x3000)
-#define GSU_PBR (*(volatile uint8_t *)0x3001)
-#define GSU_PBR1 (*(volatile uint8_t *)0x3002)
-#define GSU_ROMBR (*(volatile uint8_t *)0x3036)
+#define GSU_R15u (*(u8 *)0x301e)
+#define GSU_R15l (*(u8 *)0x301f)
+#define GSU_CBR (*(u8 *)0x3000)
+#define GSU_PBR (*(u8 *)0x3001)
+#define GSU_PBR1 (*(u8 *)0x3002)
+#define GSU_ROMBR (*(u8 *)0x3036)
 
-#define GSU_CFGR    (*(volatile uint8_t *)0x3037)
-#define GSU_CFBR    (*(volatile uint8_t *)0x3038)
-#define GSU_CLSR    (*(volatile uint8_t *)0x3039)
+#define GSU_CFGR    (*(u8 *)0x3037)
+#define GSU_CFBR    (*(u8 *)0x3038)
+#define GSU_CLSR    (*(u8 *)0x3039)
 
-#define GSU_PBR     (*(volatile uint8_t *)0x3034)
-#define GSU_SCMR    (*(volatile uint8_t *)0x303A)
-#define GSU_CACHE   (*(volatile uint8_t *)0x3100)
+#define GSU_PBR     (*(u8 *)0x3034)
+#define GSU_SCMR    (*(u8 *)0x303A)
+#define GSU_CACHE   (*(u8 *)0x3100)
 
-#define GSU_ACTIVE_FL (*(volatile uint8_t *)0x3FFF)
+#define GSU_ACTIVE_FL (*(u8 *)0x3FFF)
+
+#define GSU_COLOR (*(vuint8 *)0x701002)
 
 u16 c1;
 u8 c2;
@@ -35,25 +37,24 @@ extern void cleanSuperFX_RAM();
 void cleanSuperFX() {
     int i = 0;
     for (i = 0; i < 0xA001; i++) {
-        (*(volatile uint8_t *)(0x701000 + i)) = 0; 
+        (*(u8 *)(0x701000 + i)) = 0; 
     }
 }
 
 // Keep these functions in here.
-void setSuperFX_Function(uint16_t functionCall) {
-    (*(volatile uint8_t *)0x703F00) = (functionCall);
+void setSuperFX_Function(u16 functionCall) {
+    (*(u8 *)0x703F00) = (functionCall);
 }
 
 void executeSuperFX() {
     executeSuperFX_asm();
-    while (GSU_ACTIVE_FL)
-        ;
+    while (GSU_ACTIVE_FL == 1);
 }
 
-void plotPixel_GSU(uint8_t x, uint8_t y, uint8_t color)
+void plotPixel_GSU(u8 x, u8 y, u8 color)
 {
-    uint8_t isOverX = (x > SFX_ScreenWidth);
-    uint8_t isOverY = (y > SFX_ScreenHeight);
+    u8 isOverX = (x > SFX_ScreenWidth);
+    u8 isOverY = (y > SFX_ScreenHeight);
 
     if (isOverX) {
         x = SFX_ScreenWidth;
@@ -62,19 +63,17 @@ void plotPixel_GSU(uint8_t x, uint8_t y, uint8_t color)
         y = SFX_ScreenHeight;
     }
 
-    if (!(isOverX || isOverY)) {
-        (*(volatile uint8_t *)0x701002) = color;
-        (*(volatile uint8_t *)0x701003) = x;
-        (*(volatile uint8_t *)0x701004) = y;
-        setSuperFX_Function(1);
-            executeSuperFX();
-    }
+    GSU_COLOR = color;
+    (*(u8 *)0x701003) = x;
+    (*(u8 *)0x701004) = y;
+    setSuperFX_Function(1);
+    executeSuperFX();
 }
 
-void plotBox_GSU(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t color)
+void plotBox_GSU(u8 x, u8 y, u8 w, u8 h, u8 color)
 {
-    uint8_t isOverX = (x > SFX_ScreenWidth);
-    uint8_t isOverY = (y > SFX_ScreenHeight);
+    u8 isOverX = (x > SFX_ScreenWidth);
+    u8 isOverY = (y > SFX_ScreenHeight);
 
     if (isOverX) {
         x = SFX_ScreenWidth;
@@ -83,8 +82,8 @@ void plotBox_GSU(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t color)
         y = SFX_ScreenHeight;
     }
 
-    uint8_t isOverXW = ((x+w) > SFX_ScreenWidth);
-    uint8_t isOverYH = ((y+h) > SFX_ScreenHeight);
+    u8 isOverXW = ((x+w) > SFX_ScreenWidth);
+    u8 isOverYH = ((y+h) > SFX_ScreenHeight);
 
     if (isOverXW) {
         w = (SFX_ScreenWidth - x);
@@ -97,20 +96,20 @@ void plotBox_GSU(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t color)
     h++;
 
     if (!(isOverX || isOverY) && !(isOverXW || isOverYH)) {
-        (*(volatile uint8_t *)0x701002) = color;
-        (*(volatile uint8_t *)0x701003) = x;
-        (*(volatile uint8_t *)0x701004) = y;
-        (*(volatile uint8_t *)0x701005) = w;
-        (*(volatile uint8_t *)0x701006) = h;
+        GSU_COLOR = color;
+        (*(u8 *)0x701003) = x;
+        (*(u8 *)0x701004) = y;
+        (*(u8 *)0x701005) = w;
+        (*(u8 *)0x701006) = h;
         setSuperFX_Function(2);
-            executeSuperFX();
+        executeSuperFX();
     }
 }
 
-void plotTriangle_GSU(uint8_t x, uint8_t y, uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint8_t color)
+void plotTriangle_GSU(u8 x, u8 y, u8 x1, u8 y1, u8 x2, u8 y2, u8 color)
 {
-    uint8_t isOverX = (x > SFX_ScreenWidth);
-    uint8_t isOverY = (y > SFX_ScreenHeight);
+    u8 isOverX = (x > SFX_ScreenWidth);
+    u8 isOverY = (y > SFX_ScreenHeight);
 
     if (isOverX) {
         x = SFX_ScreenWidth;
@@ -119,8 +118,8 @@ void plotTriangle_GSU(uint8_t x, uint8_t y, uint8_t x1, uint8_t y1, uint8_t x2, 
         y = SFX_ScreenHeight;
     }
 
-    uint8_t isOverX2 = x1;
-    uint8_t isOverY2 = y1;
+    u8 isOverX2 = x1;
+    u8 isOverY2 = y1;
 
     if (isOverX2) {
         x1 = SFX_ScreenWidth;
@@ -129,8 +128,8 @@ void plotTriangle_GSU(uint8_t x, uint8_t y, uint8_t x1, uint8_t y1, uint8_t x2, 
         y1 = SFX_ScreenHeight;
     }
 
-    uint8_t isOverX3 = x1;
-    uint8_t isOverY3 = y1;
+    u8 isOverX3 = x1;
+    u8 isOverY3 = y1;
 
     if (isOverX3) {
         x2 = SFX_ScreenWidth;
@@ -140,21 +139,16 @@ void plotTriangle_GSU(uint8_t x, uint8_t y, uint8_t x1, uint8_t y1, uint8_t x2, 
     }
 
     if (!(isOverX || isOverY) && !(isOverX2 || isOverY2) && !(isOverX3 || isOverY3)) {
-        (*(volatile uint8_t *)0x701002) = color;
-        (*(volatile uint8_t *)0x701003) = x;
-        (*(volatile uint8_t *)0x701004) = y;
-        (*(volatile uint8_t *)0x701005) = x1;
-        (*(volatile uint8_t *)0x701006) = y1;
-        (*(volatile uint8_t *)0x701007) = x2;
-        (*(volatile uint8_t *)0x701008) = y2;
+        GSU_COLOR = color;
+        (*(u8 *)0x701003) = x;
+        (*(u8 *)0x701004) = y;
+        (*(u8 *)0x701005) = x1;
+        (*(u8 *)0x701006) = y1;
+        (*(u8 *)0x701007) = x2;
+        (*(u8 *)0x701008) = y2;
         setSuperFX_Function(3);
-            executeSuperFX();
+        executeSuperFX();
     }
 }
 
-void setColor_forPalette(uint8_t r, uint8_t g, uint8_t b, uint8_t palette_number, uint8_t colorNumber) {
-    uint16_t color = RGB5(r/8, g/8, b/8);
-    uint8_t  index = ((palette_number*16) + colorNumber);
-    setPaletteColor(index, color);
-}
 #endif

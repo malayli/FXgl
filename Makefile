@@ -35,6 +35,6 @@ clean_sgs:
 #---------------------------------------------------------------------------------
 pvsneslibfont.pic: pvsneslibfont.png
 	@echo convert font with no tile reduction ... $(notdir $@)
-	$(GFXCONV) -s 8 -o 16 -u 16 -p -e 0 -i $<
+	$(GFX4CONV) -s 8 -o 16 -u 16 -p -e 0 -i $<
 
 bitmaps : pvsneslibfont.pic
