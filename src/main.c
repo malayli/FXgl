@@ -129,7 +129,9 @@ int main() {
 
     while (1) {
         plotPixel_GSU(0, 0, 5);
+        plotPixel_GSU(0, 8, 5);
         plotPixel_GSU(8, 0, 5);
+        plotPixel_GSU(8, 8, 5);
         refresh = 1;
 
         WaitForVBlank();
