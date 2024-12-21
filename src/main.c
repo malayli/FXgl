@@ -88,7 +88,7 @@ int main() {
 
     // Init background
     bgSetGfxPtr(0, 0x0000);
-    bgSetMapPtr(0, 0x7000, SC_32x32);
+    bgSetMapPtr(0, 0x2C00, SC_32x32);
     WaitForVBlank();
 
     // Now Put in 16 color mode and disable Bgs except current
@@ -104,6 +104,7 @@ int main() {
             canvasTilesMap[(yy * 32) + xx] = 0x300 + (PAL1<<10);
         }
     }
+    WaitForVBlank();
 
     // Set tile addresses
     yy = 2;
@@ -116,10 +117,9 @@ int main() {
         yy += 1;
         tileAddress = 0x00 + (yy - 2);
     }
-
     WaitForVBlank();
     
-    dmaCopyVram(canvasTilesMap, 0x7000, 2048);
+    dmaCopyVram(canvasTilesMap, 0x2C00, 2048);
     setScreenOn();
 
     nmiSet(superNintendoVblank);

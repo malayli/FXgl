@@ -23,6 +23,8 @@
 #define GSU_ACTIVE_FL (*(u8 *)0x3FFF)
 
 #define GSU_COLOR (*(vuint8 *)0x701002)
+#define GSU_X (*(u8 *)0x701003)
+#define GSU_Y (*(u8 *)0x701004)
 
 u16 c1;
 u8 c2;
@@ -64,8 +66,8 @@ void plotPixel_GSU(u8 x, u8 y, u8 color) {
 
     //if (!(isOverX || isOverY)) {
         GSU_COLOR = color;
-        (*(u8 *)0x701003) = x;
-        (*(u8 *)0x701004) = y;
+        GSU_X = x;
+        GSU_Y = y;
         setSuperFX_Function(1);
         executeSuperFX();
     //}
@@ -98,8 +100,8 @@ void plotBox_GSU(u8 x, u8 y, u8 w, u8 h, u8 color)
 
     if (!(isOverX || isOverY) && !(isOverXW || isOverYH)) {
         GSU_COLOR = color;
-        (*(u8 *)0x701003) = x;
-        (*(u8 *)0x701004) = y;
+        GSU_X = x;
+        GSU_Y = y;
         (*(u8 *)0x701005) = w;
         (*(u8 *)0x701006) = h;
         setSuperFX_Function(2);
@@ -141,8 +143,8 @@ void plotTriangle_GSU(u8 x, u8 y, u8 x1, u8 y1, u8 x2, u8 y2, u8 color)
 
     if (!(isOverX || isOverY) && !(isOverX2 || isOverY2) && !(isOverX3 || isOverY3)) {
         GSU_COLOR = color;
-        (*(u8 *)0x701003) = x;
-        (*(u8 *)0x701004) = y;
+        GSU_X = x;
+        GSU_Y = y;
         (*(u8 *)0x701005) = x1;
         (*(u8 *)0x701006) = y1;
         (*(u8 *)0x701007) = x2;
