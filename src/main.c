@@ -112,13 +112,13 @@ int main() {
     while (yy < 26) {
         for (xx = 2; xx < 30; xx++) {
             canvasTilesMap[xx + (yy*32)] = tileAddress + (PAL1<<10);
-            tileAddress += 0x18;
+            tileAddress += 24;
         }
         yy += 1;
-        tileAddress = 0x00 + (yy - 2);
+        tileAddress = yy - 2;
     }
     WaitForVBlank();
-    
+
     dmaCopyVram(canvasTilesMap, 0x2C00, 2048);
     setScreenOn();
 
