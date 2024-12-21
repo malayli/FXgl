@@ -63,7 +63,7 @@ u16 tileAddress;
 
 void superNintendoVblank() {
     if (refresh == 1) {
-        dmaCopyVram(0x704000, 0x0000, 1024);
+        dmaCopyVram(0x704000, 0x0000, 4096);
         refresh = 0;
     }
 
