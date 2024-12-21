@@ -112,7 +112,7 @@ int main() {
     yy = 2;
     tileAddress = 0x00;
     while (yy < 26) {
-        for (xx = 0; tileAddress <= (0x288 + (yy - 2)); xx++) {
+        for (xx = 0; xx < 28; xx++) {
             canvasTilesMap[xx + 2 + (yy*32)] = tileAddress + (PAL1<<10);
             tileAddress += 0x18;
         }
