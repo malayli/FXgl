@@ -104,7 +104,7 @@ int main() {
     // Clean canvasTilesMap
     for (xx = 0; xx < 32; xx++) {
         for (yy = 0; yy < 32; yy++) {
-            canvasTilesMap[(yy * 32) + xx] = 64 + (PAL1<<10);
+            canvasTilesMap[(yy * 32) + xx] = 0x300 + (PAL1<<10);
         }
     }
 
