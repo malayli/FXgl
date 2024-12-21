@@ -27,7 +27,7 @@
 u16 c1;
 u8 c2;
 
-unsigned short canvas_tilesmap[0x400];
+u16 canvasTilesMap[2048];
 
 extern void SuperFXInit();
 extern void copySuperFXProgram();
@@ -51,9 +51,8 @@ void executeSuperFX() {
     while (GSU_ACTIVE_FL == 1);
 }
 
-void plotPixel_GSU(u8 x, u8 y, u8 color)
-{
-    u8 isOverX = (x > SFX_ScreenWidth);
+void plotPixel_GSU(u8 x, u8 y, u8 color) {
+    /*u8 isOverX = (x > SFX_ScreenWidth);
     u8 isOverY = (y > SFX_ScreenHeight);
 
     if (isOverX) {
@@ -61,13 +60,15 @@ void plotPixel_GSU(u8 x, u8 y, u8 color)
     }
     if (isOverY) {
         y = SFX_ScreenHeight;
-    }
+    }*/
 
-    GSU_COLOR = color;
-    (*(u8 *)0x701003) = x;
-    (*(u8 *)0x701004) = y;
-    setSuperFX_Function(1);
-    executeSuperFX();
+    //if (!(isOverX || isOverY)) {
+        GSU_COLOR = color;
+        (*(u8 *)0x701003) = x;
+        (*(u8 *)0x701004) = y;
+        setSuperFX_Function(1);
+        executeSuperFX();
+    //}
 }
 
 void plotBox_GSU(u8 x, u8 y, u8 w, u8 h, u8 color)

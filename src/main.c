@@ -59,10 +59,11 @@ u8 xx;
 u8 yy;
 u8 ii;
 u8 refresh;
+u16 tileAddress;
 
 void superNintendoVblank() {
     if (refresh == 1) {
-        dmaCopyVram(0x704000, 0x0010, 0x3C00);
+        dmaCopyVram(0x704000, 0x0000, 1024);
         refresh = 0;
     }
 
@@ -100,25 +101,35 @@ int main() {
     bgSetDisable(2);
     WaitForVBlank();
 
+    // Clean canvasTilesMap
     for (xx = 0; xx < 32; xx++) {
         for (yy = 0; yy < 32; yy++) {
-            canvas_tilesmap[(yy * 32) + xx] = (0) + (PAL1<<10);
+            canvasTilesMap[(yy * 32) + xx] = 64 + (PAL1<<10);
         }
     }
-    for (xx = 0; xx < 28; xx++) {
-        for (yy = 0; yy < 20; yy++) {
-            canvas_tilesmap[((yy+2) * 32) + (xx+4)] = (((xx * 20) + yy)+1) + (PAL1<<10);
+
+    // Set tile addresses
+    yy = 2;
+    tileAddress = 0x00;
+    while (yy < 26) {
+        for (xx = 0; tileAddress <= (0x288 + (yy - 2)); xx++) {
+            canvasTilesMap[xx + 2 + (yy*32)] = tileAddress + (PAL1<<10);
+            tileAddress += 0x18;
         }
+        yy += 1;
+        tileAddress = 0x00 + (yy - 2);
     }
+
     WaitForVBlank();
     
-    dmaCopyVram(&canvas_tilesmap[0], 0x7000, 0x400);
+    dmaCopyVram(canvasTilesMap, 0x7000, 2048);
     setScreenOn();
 
     nmiSet(superNintendoVblank);
 
     while (1) {
-        plotPixel_GSU(70, 10, 5);
+        plotPixel_GSU(0, 0, 5);
+        plotPixel_GSU(8, 0, 5);
         refresh = 1;
 
         WaitForVBlank();

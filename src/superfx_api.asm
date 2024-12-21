@@ -113,8 +113,11 @@ SuperFXInit:
     sta     GSU_PBR
     lda     #$10
     sta     GSU_SCBR
-    lda     #%00001110
+
+    ; Screen height
+    lda     #%00101010
     sta     GSU_SCMR
+
     lda     #%10000000
     sta     GSU_CFGR
     lda     #$00
