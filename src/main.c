@@ -66,14 +66,11 @@ void superNintendoVblank() {
         dmaCopyVram(0x704000, 0x0000, 4096);
         refresh = 0;
     }
-
-    snes_vblank_count++;
 }
 
 int main() {
     consoleInit();
 
-    snes_vblank_count = 0;
     refresh = 0;
 
     cleanSuperFX();
